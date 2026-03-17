@@ -7,7 +7,8 @@ import base64
 import threading
 
 
-load_dotenv("api_cal_ai.env")
+ruta_env = os.path.join(os.path.dirname(__file__), "api_cal_ai.env")
+load_dotenv(ruta_env)
 
 BOT_TOKEN = (os.getenv("BOT_TOKEN") or "").strip()
 GROQ_API_KEY = (os.getenv("GROQ_API_KEY") or "").strip()
@@ -122,6 +123,12 @@ def has_active_session(chat_id):
     with session_lock:
         return chat_id in active_sessions
 
+
+@bot.message_handler(func=lambda message: True)
+def respuesta_emergencia(message):
+    print("DEBUG: Entró al handler de emergencia")
+    bot.reply_to(message, "¡Fabrizio, te estoy escuchando!")
+
 @bot.message_handler(commands=['start', 'hello'])
 def send_welcome(message):
     start_or_refresh_session(message.chat.id)
@@ -226,6 +233,7 @@ def handle_photo(message):
 @app.route('/' + BOT_TOKEN, methods=['POST'])
 def getMessage():
     json_string = request.get_data().decode('utf-8')
+    print(f"Webhook payload: {json_string}", flush=True)
     update = telebot.types.Update.de_json(json_string)
     bot.process_new_updates([update])
     return "!", 200
