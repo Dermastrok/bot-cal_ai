@@ -1,6 +1,6 @@
 import os
 import telebot
-from flask import Flask, request # Quitamos 'app' de la importación
+from flask import Flask, request  # Borramos 'app' de la importación
 from dotenv import load_dotenv
 from groq import Groq
 import base64
