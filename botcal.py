@@ -1,3 +1,6 @@
+from turtle import update
+
+from flask import Flask, app, request
 import os
 import base64
 import threading
@@ -5,10 +8,12 @@ from groq import Groq
 import telebot
 from dotenv import load_dotenv
 
+
 load_dotenv("api_cal_ai.env")
 
 BOT_TOKEN = (os.getenv("BOT_TOKEN") or "").strip()
 GROQ_API_KEY = (os.getenv("GROQ_API_KEY") or "").strip()
+Flask = Flask(__name__)
 
 if not BOT_TOKEN:
     raise ValueError("No se encontró BOT_TOKEN en api_cal_ai.env")
@@ -218,5 +223,20 @@ def handle_photo(message):
     except Exception as e:
         reply_with_end_option(message, f"Error procesando la foto: {e}")
 
-bot.infinity_polling()
+# Esta ruta es la que Telegram va a "golpear"
+@app.route('/' + BOT_TOKEN, methods=['POST'])
+def getMessage():
+    json_string = request.get_data().decode('utf-8')
+    update = telebot.types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return "!", 200
+
+@app.route("/")
+def webhook():
+    bot.remove_webhook()
+    # Aquí pones la URL de tu Web App de PythonAnywhere
+    bot.set_webhook(url='https://Dermastroke.pythonanywhere.com/' + BOT_TOKEN)
+    return "Webhook seteado con éxito", 200
+
+# Tus funciones de manejo de mensajes (on_message, etc) van acá igual que antes...
 
