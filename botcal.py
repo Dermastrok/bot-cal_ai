@@ -1,25 +1,24 @@
-from turtle import update
-
-from flask import Flask, app, request
 import os
+import telebot
+from flask import Flask, request # Quitamos 'app' de la importación
+from dotenv import load_dotenv
+from groq import Groq
 import base64
 import threading
-from groq import Groq
-import telebot
-from dotenv import load_dotenv
 
 
 load_dotenv("api_cal_ai.env")
 
 BOT_TOKEN = (os.getenv("BOT_TOKEN") or "").strip()
 GROQ_API_KEY = (os.getenv("GROQ_API_KEY") or "").strip()
-Flask = Flask(__name__)
+
 
 if not BOT_TOKEN:
     raise ValueError("No se encontró BOT_TOKEN en api_cal_ai.env")
 if not GROQ_API_KEY:
     raise ValueError("No se encontró GROQ_API_KEY en api_cal_ai.env")
 
+app = Flask(__name__)
 bot = telebot.TeleBot(BOT_TOKEN)
 client = Groq(api_key=GROQ_API_KEY)
 
